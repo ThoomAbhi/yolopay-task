@@ -1,18 +1,21 @@
-# Use official Node.js image
+# Use stable Node version supported by Expo (Node 18 works fine)
 FROM node:18-bullseye
 
-# Create app directory
+# Set working directory
 WORKDIR /app
 
-# Install dependencies
+# Copy only package files first (for caching)
 COPY package*.json ./
-RUN npm install -g expo-cli && npm install
 
-# Copy the rest of the project
+# Install project dependencies
+RUN npm install --legacy-peer-deps
+
+
+# Copy the rest of the code
 COPY . .
 
-# Expose Expo ports
-EXPOSE 19000 19001 19002
+# Expose required ports
+EXPOSE 19000 19001 19002 19006
 
-# Start the Expo development server
-CMD ["npx", "expo", "start", "--tunnel"]
+# Use local expo CLI via npx, bind to 0.0.0.0
+CMD ["npx", "expo", "start", "--web", "--host", "0.0.0.0"]
